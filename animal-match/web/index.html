@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>동물상 매칭 – 참가자 입력</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="pastel">
+  <!-- 배경 장식 -->
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+  <div class="bg-grid"></div>
+
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-logo">🐾</div>
+      <h1>동물상 매칭</h1>
+    </div>
+    <p class="subtitle">간단한 정보만 입력하면 매칭에 참여할 수 있어요.</p>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <h2 class="panel-title">기본 정보</h2>
+
+      <form id="entryForm" class="form-grid">
+        <div class="field">
+          <label for="gender">성별</label>
+          <select id="gender" name="gender" required>
+            <option value="">선택</option>
+            <option>남</option>
+            <option>여</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="grade">학년</label>
+          <select id="grade" name="grade" required>
+            <option value="">선택</option>
+            <option>고1</option>
+            <option>고2</option>
+            <option>고3</option>
+            <option>기타</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="face">내 얼굴형</label>
+          <select id="face" name="face" required>
+            <option value="">선택</option>
+            <option>고양이상</option>
+            <option>강아지상</option>
+            <option>하마상</option>
+            <option>여우상</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label for="intro">자기소개</label>
+          <textarea id="intro" name="intro" rows="4" placeholder="간단한 자기소개를 적어주세요!" required></textarea>
+        </div>
+
+        <div class="field">
+          <label>사진 촬영 동의</label>
+          <div class="choice-row">
+            <label class="radio">
+              <input type="radio" name="consent" value="예" required />
+              <span>예 (촬영/활용에 동의합니다)</span>
+            </label>
+            <label class="radio">
+              <input type="radio" name="consent" value="아니요" required />
+              <span>아니요 (촬영/활용에 동의하지 않습니다)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn primary">제출하기</button>
+          <button type="reset" class="btn ghost">초기화</button>
+        </div>
+
+        <p id="status" class="status">대기 중</p>
+      </form>
+    </section>
+
+    <section class="panel tip">
+      <h2 class="panel-title">안내</h2>
+      <ul class="bullets">
+        <li>촬영 동의는 꼭 본인의 의사를 선택해 주세요.</li>
+        <li>제출된 정보는 <b>이 브라우저</b>의 관리자 페이지에서만 보입니다.</li>
+        <li>여러 기기에서 한 곳으로 모으려면 백엔드가 필요해요.</li>
+      </ul>
+      <div class="note">
+        관리자이신가요? <a href="/admin">관리자 페이지로 이동</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <small>© 2025 Animal Match – Pastel Edition</small>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
