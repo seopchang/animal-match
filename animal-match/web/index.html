@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body class="pastel">
-  <!-- 배경 장식 -->
   <div class="bg-orb orb-a"></div>
   <div class="bg-orb orb-b"></div>
   <div class="bg-grid"></div>
@@ -17,7 +16,7 @@
       <div class="brand-logo">🐾</div>
       <h1>동물상 매칭</h1>
     </div>
-    <p class="subtitle">간단한 정보만 입력하면 매칭에 참여할 수 있어요.</p>
+    <p class="subtitle">간단한 정보를 입력하고 참여해 보세요.</p>
   </header>
 
   <main class="container">
@@ -25,6 +24,11 @@
       <h2 class="panel-title">기본 정보</h2>
 
       <form id="entryForm" class="form-grid">
+        <div class="field">
+          <label for="name">이름</label>
+          <input id="name" name="name" type="text" placeholder="이름을 입력하세요" required />
+        </div>
+
         <div class="field">
           <label for="gender">성별</label>
           <select id="gender" name="gender" required>
@@ -76,29 +80,17 @@
         </div>
 
         <div class="actions">
-          <button type="submit" class="btn primary">제출하기</button>
+          <button type="submit" class="btn">제출하기</button>
           <button type="reset" class="btn ghost">초기화</button>
         </div>
 
         <p id="status" class="status">대기 중</p>
       </form>
     </section>
-
-    <section class="panel tip">
-      <h2 class="panel-title">안내</h2>
-      <ul class="bullets">
-        <li>촬영 동의는 꼭 본인의 의사를 선택해 주세요.</li>
-        <li>제출된 정보는 <b>이 브라우저</b>의 관리자 페이지에서만 보입니다.</li>
-        <li>여러 기기에서 한 곳으로 모으려면 백엔드가 필요해요.</li>
-      </ul>
-      <div class="note">
-        관리자이신가요? <a href="/admin">관리자 페이지로 이동</a>
-      </div>
-    </section>
   </main>
 
   <footer class="app-footer">
-    <small>© 2025 Animal Match – Pastel Edition</small>
+    <small>© 2025 Animal Match – Pastel Edition · <a href="/admin">관리자 페이지</a></small>
   </footer>
 
   <script src="/app.js"></script>
