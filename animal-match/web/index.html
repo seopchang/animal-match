@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>동물상 매칭 – 참가자 입력</title>
+  <title>동물상 매칭 – 참가자</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="/style.css" />
 </head>
@@ -16,11 +16,12 @@
       <div class="brand-logo">🐾</div>
       <h1>동물상 매칭</h1>
     </div>
-    <p class="subtitle">간단한 정보를 입력하고 참여해 보세요.</p>
+    <p class="subtitle">정보 입력 → 매칭하기 → 결과 확인</p>
   </header>
 
   <main class="container">
-    <section class="panel">
+    <!-- 입력 패널 -->
+    <section class="panel" id="formPanel">
       <h2 class="panel-title">기본 정보</h2>
 
       <form id="entryForm" class="form-grid">
@@ -68,29 +69,50 @@
         <div class="field">
           <label>사진 촬영 동의</label>
           <div class="choice-row">
-            <label class="radio">
-              <input type="radio" name="consent" value="예" required />
-              <span>예 (촬영/활용에 동의합니다)</span>
-            </label>
-            <label class="radio">
-              <input type="radio" name="consent" value="아니요" required />
-              <span>아니요 (촬영/활용에 동의하지 않습니다)</span>
-            </label>
+            <label class="radio"><input type="radio" name="consent" value="예" required /><span>예 (촬영/활용에 동의합니다)</span></label>
+            <label class="radio"><input type="radio" name="consent" value="아니요" required /><span>아니요 (촬영/활용에 동의하지 않습니다)</span></label>
           </div>
         </div>
 
         <div class="actions">
-          <button type="submit" class="btn">제출하기</button>
+          <button type="submit" class="btn">매칭하기</button>
           <button type="reset" class="btn ghost">초기화</button>
         </div>
 
         <p id="status" class="status">대기 중</p>
       </form>
     </section>
+
+    <!-- 결과 카드 -->
+    <section class="result-card" id="resultCard" aria-live="polite">
+      <div class="result-header">매칭 결과</div>
+      <div class="result-names">
+        <span id="meName">나</span>
+        <span class="result-heart">❤️</span>
+        <span id="partnerName">상대</span>
+      </div>
+      <div class="result-detail" id="partnerDetail">
+        <!-- 상대 상세(성별/학년/얼굴형/자기소개) -->
+      </div>
+      <div class="result-actions">
+        <button id="retryBtn" class="btn ghost">다시하기</button>
+      </div>
+    </section>
   </main>
 
+  <!-- 4초 로딩 오버레이 -->
+  <div id="loadingOverlay" class="full-overlay hidden" aria-hidden="true">
+    <div class="overlay-card">
+      <svg class="heart" viewBox="0 0 24 24" width="72" height="72" aria-hidden="true">
+        <path d="M12 21s-6.716-4.343-9.193-7.035C1.126 12.126 1 10.51 1.737 9.25 2.78 7.455 4.94 7 6.54 7c1.6 0 3.266.83 3.96 2.07.694-1.24 2.36-2.07 3.96-2.07s3.76.455 4.8 2.25c.74 1.26.61 2.876-.07 4.715C18.716 16.657 12 21 12 21z" fill="currentColor"/>
+      </svg>
+      <div class="loading-text">매칭 중<span class="dots"></span></div>
+      <div class="loading-sub">같은 동물상 + 성별 다른 상대를 찾고 있어요…</div>
+    </div>
+  </div>
+
   <footer class="app-footer">
-    <small>© 2025 Animal Match – Pastel Edition · <a href="/admin">관리자 페이지</a></small>
+    <small>© 2025 Animal Match – Pastel Edition · <a href="/admin">관리자</a></small>
   </footer>
 
   <script src="/app.js"></script>

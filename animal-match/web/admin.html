@@ -16,57 +16,43 @@
       <div class="brand-logo">📋</div>
       <h1>관리자 페이지</h1>
     </div>
-    <p class="subtitle">제출 목록 · 랜덤 매칭 · CSV 내보내기</p>
+    <p class="subtitle">제출 목록 · 매칭 기록 · CSV 내보내기</p>
   </header>
 
   <main class="container admin">
+    <!-- 제출 목록 -->
     <section class="panel">
       <h2 class="panel-title">제출 목록</h2>
-
       <div class="toolbar">
         <button id="refreshBtn" class="btn">새로고침</button>
-        <button id="clearBtn" class="btn ghost">모두 삭제(이 브라우저)</button>
+        <button id="clearBtn" class="btn ghost">제출 데이터 삭제</button>
         <button id="exportCsvBtn" class="btn ghost">CSV 내보내기</button>
-        <span class="muted">데이터 소스: <code>localStorage</code></span>
+        <span class="muted">저장소: localStorage</span>
       </div>
-
       <div class="table-wrap">
         <table id="submissionsTable">
           <thead>
             <tr>
-              <th>#</th>
-              <th>시간</th>
-              <th>이름</th>
-              <th>성별</th>
-              <th>학년</th>
-              <th>얼굴형</th>
-              <th>동의</th>
-              <th>자기소개</th>
+              <th>#</th><th>시간</th><th>이름</th><th>성별</th><th>학년</th><th>얼굴형</th><th>동의</th><th>자기소개</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
-
       <p id="adminStatus" class="status">대기 중</p>
     </section>
 
+    <!-- 매칭 기록 -->
     <section class="panel">
-      <h2 class="panel-title">랜덤 매칭 (같은 동물상 + 성별 다름)</h2>
+      <h2 class="panel-title">매칭 기록(누적)</h2>
       <div class="toolbar">
-        <button id="matchBtn" class="btn">매칭 생성(동의자만)</button>
         <button id="clearMatchBtn" class="btn ghost">매칭 기록 삭제</button>
-        <span class="muted" id="matchInfo"></span>
       </div>
-
       <div class="table-wrap">
         <table id="matchesTable">
           <thead>
             <tr>
-              <th>#</th>
-              <th>A (이름/성별/학년/얼굴형)</th>
-              <th>B (이름/성별/학년/얼굴형)</th>
-              <th>기준</th>
+              <th>#</th><th>시간</th><th>A (이름/성별/학년/얼굴형)</th><th>B (이름/성별/학년/얼굴형)</th><th>기준</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -74,17 +60,6 @@
       </div>
     </section>
   </main>
-
-  <!-- 4초 로딩 오버레이 -->
-  <div id="loadingOverlay" class="full-overlay hidden" aria-hidden="true">
-    <div class="overlay-card">
-      <svg class="heart" viewBox="0 0 24 24" width="72" height="72" aria-hidden="true">
-        <path d="M12 21s-6.716-4.343-9.193-7.035C1.126 12.126 1 10.51 1.737 9.25 2.78 7.455 4.94 7 6.54 7c1.6 0 3.266.83 3.96 2.07.694-1.24 2.36-2.07 3.96-2.07s3.76.455 4.8 2.25c.74 1.26.61 2.876-.07 4.715C18.716 16.657 12 21 12 21z" fill="currentColor"/>
-      </svg>
-      <div class="loading-text">매칭 중<span class="dots" aria-hidden="true"></span></div>
-      <div class="loading-sub">같은 동물상 + 성별 다른 조합을 찾고 있어요…</div>
-    </div>
-  </div>
 
   <footer class="app-footer">
     <small>© 2025 Animal Match – Admin</small>

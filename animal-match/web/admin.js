@@ -1,17 +1,15 @@
 const LS_SUB = "animal_match_submissions";
-const LS_MATCH = "animal_match_matches";
+const LS_MATCH_LOG = "animal_match_matchlog";
 
 const adminStatus = document.getElementById("adminStatus");
 const submissionsBody = document.getElementById("submissionsTable").querySelector("tbody");
 const matchesBody = document.getElementById("matchesTable").querySelector("tbody");
-const matchInfo = document.getElementById("matchInfo");
 
 function setAdminStatus(t){ adminStatus.textContent = t; }
-function readSubmissions(){ return JSON.parse(localStorage.getItem(LS_SUB) || "[]"); }
-function readMatches(){ return JSON.parse(localStorage.getItem(LS_MATCH) || "[]"); }
-function writeMatches(matchRecord){ localStorage.setItem(LS_MATCH, JSON.stringify(matchRecord)); }
+function readSubs(){ return JSON.parse(localStorage.getItem(LS_SUB) || "[]"); }
+function readMatchLog(){ return JSON.parse(localStorage.getItem(LS_MATCH_LOG) || "[]"); }
 
-function renderTable(rows){
+function renderSubs(rows){
   submissionsBody.innerHTML = "";
   rows.forEach((r,i)=>{
     const tr = document.createElement("tr");
@@ -29,98 +27,47 @@ function renderTable(rows){
   });
 }
 
-function shuffle(arr){
-  for(let i=arr.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
-  }
-  return arr;
-}
+function fmtRow(x){ return `${x?.name||"-"}/${x?.gender||"-"}/${x?.grade||"-"}/${x?.face||"-"}`; }
 
-/**
- * 같은 동물상(face) + 성별 다른(남/여) 사람끼리 랜덤 매칭
- * - 동의(consent) == '예' 인 사람만 대상
- * - 각 얼굴형 그룹별로 남/여 분리 후 셔플 → 순서대로 페어링
- */
-function createRandomMatches(rows){
-  const pool = rows.filter(r => r.consent === "예" && r.face && r.gender);
-  const faces = ["고양이상","강아지상","하마상","여우상"];
-  const pairs = [];
-
-  faces.forEach(face => {
-    const males = shuffle(pool.filter(r => r.face===face && r.gender==="남"));
-    const females = shuffle(pool.filter(r => r.face===face && r.gender==="여"));
-    const n = Math.min(males.length, females.length);
-    for (let i=0;i<n;i++){
-      pairs.push({ a:males[i], b:females[i], rule:`${face} + 성별 다름` });
-    }
-  });
-
-  return pairs;
-}
-
-function renderMatches(pairs){
+function renderMatchLog(log){
   matchesBody.innerHTML = "";
-  pairs.forEach((p,idx)=>{
-    const fmt = x => `${x.name||"-"}/${x.gender||"-"}/${x.grade||"-"}/${x.face||"-"}`;
+  log.forEach((m,i)=>{
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${idx+1}</td><td>${fmt(p.a)}</td><td>${fmt(p.b)}</td><td>${p.rule}</td>`;
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>${m.timestamp ? new Date(m.timestamp).toLocaleString() : "-"}</td>
+      <td>${fmtRow(m.a)}</td>
+      <td>${m.b ? fmtRow(m.b) : "(상대 없음)"}</td>
+      <td>${m.rule||"-"}</td>
+    `;
     matchesBody.appendChild(tr);
   });
 }
 
 function refresh(){
   setAdminStatus("불러오는 중…");
-  renderTable(readSubmissions());
-  const saved = readMatches();
-  if (saved && saved.pairs){
-    renderMatches(saved.pairs);
-    matchInfo.textContent = saved.timestamp ? `최근 매칭: ${new Date(saved.timestamp).toLocaleString()}` : "";
-  } else {
-    matchesBody.innerHTML = "";
-    matchInfo.textContent = "";
-  }
+  renderSubs(readSubs());
+  renderMatchLog(readMatchLog());
   setAdminStatus("대기 중");
 }
 
 document.getElementById("refreshBtn").addEventListener("click", refresh);
-
-document.getElementById("matchBtn").addEventListener("click", ()=>{
-  const overlay = document.getElementById("loadingOverlay");
-  overlay.classList.remove("hidden");
-  setAdminStatus("매칭 중…");
-
-  setTimeout(()=>{
-    const pairs = createRandomMatches(readSubmissions());
-    renderMatches(pairs);
-    // 매칭 결과 저장 (관리자 페이지에서 항상 볼 수 있게)
-    writeMatches({ timestamp: new Date().toISOString(), pairs });
-    matchInfo.textContent = `최근 매칭: ${new Date().toLocaleString()}`;
-
-    overlay.classList.add("hidden");
-    setAdminStatus("대기 중");
-  }, 4000);
-});
-
 document.getElementById("clearBtn").addEventListener("click", ()=>{
-  if (confirm("정말 제출 데이터를 모두 삭제할까요? (이 브라우저)")) {
+  if (confirm("제출 데이터를 모두 삭제할까요? (이 브라우저)")){
     localStorage.removeItem(LS_SUB);
-    submissionsBody.innerHTML = "";
+    refresh();
     alert("제출 데이터를 삭제했습니다.");
   }
 });
-
 document.getElementById("clearMatchBtn").addEventListener("click", ()=>{
-  if (confirm("매칭 기록(최근 1회)을 삭제할까요? (이 브라우저)")) {
-    localStorage.removeItem(LS_MATCH);
-    matchesBody.innerHTML = "";
-    matchInfo.textContent = "";
+  if (confirm("매칭 기록(누적)을 삭제할까요? (이 브라우저)")){
+    localStorage.removeItem(LS_MATCH_LOG);
+    refresh();
     alert("매칭 기록을 삭제했습니다.");
   }
 });
-
 document.getElementById("exportCsvBtn").addEventListener("click", ()=>{
-  const rows = readSubmissions();
+  const rows = readSubs();
   const header = ["timestamp","name","gender","grade","face","intro","consent"];
   const lines = [header.join(",")].concat(
     rows.map(r => header.map(h => `"${(r[h]||"").toString().replaceAll('"','""')}"`).join(","))
