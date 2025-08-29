@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Animal Match</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <h1>Animal Match</h1>
+
+    <form id="joinForm">
+      <label>이름
+        <input type="text" id="name" required placeholder="홍길동" />
+      </label>
+
+      <label>동물형
+        <select id="animal" required>
+          <option value="">선택</option>
+          <option>dog</option>
+          <option>cat</option>
+          <option>fox</option>
+          <option>hippo</option>
+          <option>bear</option>
+          <option>rabbit</option>
+        </select>
+      </label>
+
+      <button type="submit" id="btnJoin">매칭하기</button>
+    </form>
+
+    <div id="state" class="state"></div>
+
+    <div id="result" class="card hidden">
+      <div class="heart">❤</div>
+      <h2 id="pairTitle">매칭 완료!</h2>
+      <p><b id="meName"></b> 🤝 <b id="partnerName"></b></p>
+      <p class="small">동물형: <span id="animalType"></span> | 매치ID: <span id="matchId"></span></p>
+      <button id="btnReset">다시하기</button>
+    </div>
+  </div>
+
+  <script src="/static/main.js"></script>
+</body>
+</html>
