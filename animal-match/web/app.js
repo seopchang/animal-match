@@ -11,7 +11,7 @@ const partnerDetailEl = document.getElementById("partnerDetail");
 const overlay = document.getElementById("loadingOverlay");
 const retryBtn = document.getElementById("retryBtn");
 
-function setStatus(t){ statusEl.textContent = t; }
+function setStatus(t){ if(statusEl) statusEl.textContent = t; }
 function readSubs(){ return JSON.parse(localStorage.getItem(LS_SUB) || "[]"); }
 function writeSubs(arr){ localStorage.setItem(LS_SUB, JSON.stringify(arr)); }
 function readMatchLog(){ return JSON.parse(localStorage.getItem(LS_MATCH_LOG) || "[]"); }
@@ -34,7 +34,7 @@ function getFormData(){
     grade: form.grade.value.trim(),
     face:  form.face.value.trim(),
     intro: form.intro.value.trim(),
-    consent: consentInput ? consentInput.value : ""
+    consent: consentInput ? consentInput.value : "" // 매칭 조건에는 사용 안 함
   };
 }
 
@@ -44,28 +44,56 @@ function saveSubmission(row){
   writeSubs(arr);
 }
 
-function findPartnerFor(me, all){
-  // 같은 얼굴형 + 성별 다른 + 동의 '예' + (본인 제외)
-  const pool = all.filter(p =>
-    p !== me &&
-    p.consent === "예" &&
-    p.face === me.face &&
-    p.gender && me.gender && p.gender !== me.gender
-  );
-  if (pool.length === 0) return null;
-  shuffle(pool);
-  return pool[0]; // 랜덤 1명
+/**
+ * 항상 파트너를 고르는 함수 (본인 제외).
+ * 버킷 우선순위:
+ * 1) 같은 얼굴형 + 성별 다름
+ * 2) 같은 얼굴형 (성별 무관)
+ * 3) 얼굴형 다름 + 성별 다름
+ * 4) 그 외 아무나
+ * 아무 버킷도 없으면 null (즉, 본인만 있는 경우)
+ */
+function pickPartnerAlways(me, all){
+  const candidates = all.filter(p => p !== me); // 본인 제외
+  if (candidates.length === 0) return { partner: null, rule: "상대 없음" };
+
+  const sameFace = c => c.face === me.face;
+  const diffFace = c => c.face && me.face && c.face !== me.face;
+  const diffGender = c => c.gender && me.gender && c.gender !== me.gender;
+
+  const buckets = [
+    { rule: "같은 얼굴형 + 성별 다름", list: [] },
+    { rule: "같은 얼굴형",             list: [] },
+    { rule: "얼굴형 다름 + 성별 다름", list: [] },
+    { rule: "아무나",                   list: [] },
+  ];
+
+  for (const c of candidates){
+    if (sameFace(c) && diffGender(c)) { buckets[0].list.push(c); continue; }
+    if (sameFace(c))                  { buckets[1].list.push(c); continue; }
+    if (diffFace(c) && diffGender(c)) { buckets[2].list.push(c); continue; }
+    buckets[3].list.push(c);
+  }
+
+  for (const b of buckets){
+    if (b.list.length > 0){
+      shuffle(b.list);
+      return { partner: b.list[0], rule: b.rule };
+    }
+  }
+  return { partner: null, rule: "상대 없음" };
 }
 
 function showOverlay(){ overlay.classList.remove("hidden"); }
 function hideOverlay(){ overlay.classList.add("hidden"); }
 
-function showResult(me, partner){
+function showResult(me, partner, rule){
   meNameEl.textContent = me.name || "나";
   if (partner){
     partnerNameEl.textContent = partner.name || "상대";
     partnerDetailEl.innerHTML = `
-      <div><b>상대 정보</b></div>
+      <div><b>매칭 기준</b>: ${rule}</div>
+      <div style="margin-top:8px"><b>상대 정보</b></div>
       <div>이름: ${partner.name||"-"}</div>
       <div>성별: ${partner.gender||"-"}</div>
       <div>학년: ${partner.grade||"-"}</div>
@@ -85,7 +113,6 @@ function showResult(me, partner){
 }
 
 retryBtn.addEventListener("click", ()=>{
-  // 다시하기 → 처음 화면 초기화
   form.reset();
   setStatus("대기 중");
   resultCard.style.display = "none";
@@ -101,29 +128,22 @@ form.addEventListener("submit", (e)=>{
     return;
   }
 
-  // 저장(동의 '아니요'도 저장)
+  // 저장 (동의 '아니요'도 저장)
   saveSubmission(me);
-  setStatus("제출됨. 매칭 준비…");
+  setStatus("저장 완료! 매칭을 시작합니다…");
 
-  if (me.consent !== "예"){
-    alert("촬영/활용 동의자만 매칭이 가능합니다. (데이터는 저장되었습니다)");
-    // 결과 카드(상대 없음)로 안내
-    showResult(me, null);
-    return;
-  }
-
-  // 동의자 → 로딩오버레이(4초) → 매칭 시도
+  // 로딩 4초 후 항상 매칭 시도
   showOverlay();
   setTimeout(()=>{
     const all = readSubs();
-    const partner = findPartnerFor(me, all);
+    const { partner, rule } = pickPartnerAlways(me, all);
 
-    // 매칭 기록(관리자용) 누적 저장
+    // 매칭 기록(누적) 저장 (관리자 페이지에서 항상 볼 수 있음)
     const log = readMatchLog();
-    log.push({ timestamp:new Date().toISOString(), a:me, b:partner, rule:"같은 동물상 + 성별 다름" });
+    log.push({ timestamp:new Date().toISOString(), a:me, b:partner, rule: partner ? rule : "상대 없음" });
     writeMatchLog(log);
 
     hideOverlay();
-    showResult(me, partner);
+    showResult(me, partner, rule);
   }, 4000);
 });
